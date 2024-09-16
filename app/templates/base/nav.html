@@ -1,0 +1,16 @@
+<nav>
+    <div class="container1">
+      <h2 class="logo">SmartPantry</h2>
+      <!-- <div class="search-bar">
+        <i class="uil uil-search"></i>
+        <input type="search" placeholder="Search for shared food items" />
+      </div> -->
+      <div class="create">
+        <p>Hi {{ session.get('first_name', 'Guest') }}</p>
+        <a href="{{ url_for('auth.logout') }}">
+          <label class="btn1 btn1-primary" for="create-post"
+            >Logout</label>
+        </a>
+      </div>
+    </div>
+</nav>

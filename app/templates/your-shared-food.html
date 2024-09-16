@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+    />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content=""width="" , initial-scale=1.0" />
+    <title>SmartPantry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v2.1.6/css/unicons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/styles.css')}}"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js" integrity="sha512-X/YkDZyjTf4wyc2Vy16YGCPHwAY8rZJY+POgokZjQB2mhIRFJCckEGc6YyX9eNsPfn0PzThEuNs+uaomE5CO6A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    {% include 'base/nav.html' %}
+    
+    <main>
+        
+        <div class="container1" style="margin-top: 25px">
+            {% include 'base/sidebar.html' %}
+        
+
+            <div class="middle">
+
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" style="color: #000" data-bs-toggle="tab" href="#yourListing">Your Listing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab"  style="color: #000" href="#claimsMade">Claims Made</a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                            <!-- Your Listing Tab -->
+                        <div id="yourListing" class="container tab-pane active">
+                            <!-- Listing Table -->
+                            <div class="table-wrapper">
+                                <div class="table-title">
+                                    <div class="row justify-content-between">
+                                        <div class="col-sm-6">
+                                            <h2>Your Listing</h2>
+                                        </div>
+                                        <div class="col-sm-6 d-flex justify-content-end"></div>
+                                    </div>
+                                </div>
+                                <table class="table table-stripped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%;">Id</th>
+                                            <th style="width: 15%;">Post Title</th>
+                                            <th style="width: 15%;">Food Item</th>
+                                            <th style="width: 25%;">Description</th>
+                                            <th style="width: 5%;">Qty</th>
+                                            <th style="width: 10%;">Expiry Date</th>
+                                            <th style="width: 10%;">Status</th>
+                                            <th style="width: 10%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in shared_items %}
+                                    <tr>
+                                        <td>SPS{{ item.share_id }}</td>
+                                        <td>{{ item.title }}</td>
+                                        <td>{{ item.food_name }}</td>
+                                        <td>{{ item.description }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ item.expiration_date }}</td>
+                                        <td>{{ item.status }}</td>
+                                        {% if item.status == 'Shared' %}
+                                        <td>
+                                            <!-- Dropdown Button -->
+                                            <div class="dropdown">
+                                            <button class="btn1 btn2-secondary dropdown-toggle btn-sm" type="button" id="actionDropdownButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="actionDropdownButton1">
+                                                <li><a class="dropdown-item" href="#editShare" data-bs-toggle="modal" data-bs-target="#editShare" onclick="editSharedItem('{{ item.share_id }}');">Edit Post</a></li>
+                                                <!-- <li><a class="dropdown-item" href="#viewClaims" data-bs-toggle="modal" data-bs-target="#viewClaims" onclick="viewClaims('{{ item.share_id }}');">View Claims</a></li> -->
+                                                <li><a class="dropdown-item" href="#viewClaims" data-bs-toggle="modal" data-bs-target="#viewClaims" onclick="viewClaims('{{ item.share_id }}');">View Claims</a></li>
+                                                <li><a class="dropdown-item" href="#markClaims" data-bs-toggle="modal" data-bs-target="#markClaims" onclick="markClaims('{{ item.share_id }}');">Marks As Claimed</a></li>
+                                                <li><a class="dropdown-item" href="#unshare" data-bs-toggle="modal" data-bs-target="#unshare" onclick="setShareId('{{ item.share_id }}');">Unshare</a></li>
+                                            </ul>
+                                            </div>
+                                        </td>
+                                        {% else %}
+                                        <td>
+                                            <!-- Dropdown Button -->
+                                            <div class="dropdown">
+                                            <button class="btn1 btn2-secondary dropdown-toggle btn-sm" type="button" id="actionDropdownButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="actionDropdownButton1">
+                                                <li><a class="dropdown-item" href="#viewClaims" data-bs-toggle="modal" data-bs-target="#viewClaims" onclick="viewClaims('{{ item.share_id }}');">View Claims</a></li>
+                                            </ul>
+                                            </div>
+                                        </td>
+                                        {% endif %}
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">You haven't shared a food item</td>
+                                    </tr>
+                                    </tbody>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+
+                        
+                        <!-- Claims Made Tab -->
+                        <div id="claimsMade" class="container tab-pane fade">
+                            <!-- Claims Recieved Table -->
+                            <div class="table-wrapper">
+                                <div class="table-title">
+                                    <div class="row justify-content-between">
+                                        <div class="col-sm-6">
+                                            <h2>Claims Made</h2>
+                                        </div>
+                                        <div class="col-sm-6 d-flex justify-content-end">
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-stripped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%;">Claim Date</th>
+                                            <th style="width: 15%;">Post Title</th>
+                                            <th style="width: 20%;">Description</th>
+                                            <th style="width: 15%;">Quantity</th>
+                                            <th style="width: 15%;">Expiry Date</th>
+                                            <th style="width: 15%;">Claim Status</th>
+                                            <th style="width: 10%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if user_claims %}
+                                            {% for claim in user_claims %}
+                                                <tr>
+                                                    <td>{{ claim.claim_date }}</td>
+                                                    <td>{{ claim.title }}</td>
+                                                    <td>{{ claim.description }}</td>
+                                                    <td>{{ claim.quantity }}</td>
+                                                    <td>{{ claim.expiration_date }}</td>
+
+                                                    {% if claim.sharedfood_status == 'Shared' %}
+                                                        <td><span class="badge bg-info" style="font-size: 0.7rem;">Pending claim request</span></td>
+                                                    {% elif claim.sharedfood_status == 'Claimed' and claim.claimfoodstatus == 0 %}
+                                                        <td><span class="badge bg-danger" style="font-size: 0.7rem;">Claimed by other users</span></td>
+                                                    {% elif claim.sharedfood_status == 'Claimed' and claim.claimfoodstatus == 1 %}
+                                                        <td><span class="badge bg-success" style="font-size: 0.7rem;">Your claim accepted</span></td>
+                                                    {% endif %}
+                                                    {% if claim.sharedfood_status == 'Shared' %}
+                                                    <td>
+                                                        <!-- Dropdown Button -->
+                                                        <div class="dropdown">
+                                                            <button class="btn1 btn2-secondary dropdown-toggle btn-sm" type="button" id="actionDropdownButton{{ claim.claim_id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Actions
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="actionDropdownButton{{ claim.claim_id }}">
+                                                                <li><a class="dropdown-item" href="mailto:{{ claim.sharer_email }}?subject={{ claim.email_subject }}&body=Hi there,"">Message Seller</a></li>
+                                                                <li><a class="dropdown-item" href="#deleteClaims" data-bs-toggle="modal" data-bs-target="#deleteClaims" onclick="setClaimId('{{ claim.claim_id }}');">UnClaim</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                    {% else %}
+                                                    <td></td>
+                                                    {% endif %}
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="7" class="text-center">No food items in this category</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        
+                    </div>
+                </div>
+           
+          </div>
+        </div>
+
+
+
+
+        <!-- Modals -->
+
+
+
+        <!-- Delete Claim -->
+        <div id="deleteClaims" class="modal fade">
+            <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+            <div class="modal-content modal-xl">
+                <form
+                action="{{ url_for('yourSharedFood.unclaim_food') }}"
+                method="post"
+                id="deleteClaimsId"
+                >
+                <div class="modal-header">
+                    <h5 class="modal-title">Unclaim</h5>
+                    <button
+                    type="button"
+                    class="close"
+                    data-bs-dismiss="modal"
+                    aria-hidden="true"
+                    >
+                    ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <p>Are you sure you want to unclaim</p>
+                        <input type="hidden" name="claim_id" id="claim_id" value="">
+                    </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                    <input
+                        type="button"
+                        class="btn btn-default"
+                        data-bs-dismiss="modal"
+                        value="Cancel"
+                        id="cancelClaims"
+                    />
+                    <input
+                        type="submit"
+                        class="btn btn-success"
+                        name="cmdaddnew"
+                        id="unclaimItems"
+                        value="Unclaim"
+                    />
+                </div>
+                </form>
+            </div>
+            </div>
+        </div>
+
+        <!-- Unshare -->
+        <div id="unshare" class="modal fade" tabindex="-1" aria-labelledby="unshareModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered custom-modal-dialog modal-xl">
+              <div class="modal-content">
+                <form action="{{ url_for('yourSharedFood.unshare_food') }}" method="post" id="unshareForm">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="unshareModalLabel">Unshare Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <p>Are you sure you want to unshare item?</p>
+                      <input type="hidden" name="share_id" id="share_id_unshare">
+                    </div>
+                  </div>
+                  <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+                    <input type="submit" class="btn btn-success" name="cmdaddnew" id="unshareItem" value="Unshare">
+                  </div>
+                </form>
+              </div>
+            </div>
+        </div>
+          
+        <!-- Edit Share Modal HTML -->
+        <div id="editShare" class="modal fade" tabindex="-1" aria-labelledby="editShareModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered custom-modal-dialog modal-xl">
+            <div class="modal-content">
+                <form action="#" method="post" id="editShareForm">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="editShareModalLabel">Edit Shared Item</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                    <input
+                        type="hidden"
+                        id="edit_share_id"
+                        name="share_id"
+                        class="form-control"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Title"
+                        id="edit_title"
+                        name="post_title"
+                        class="form-control form-prop"
+                        required
+                    />
+                    <textarea
+                        class="form-control form-prop"
+                        placeholder="Description"
+                        name="description"
+                        id="edit_description"
+                        required
+                    ></textarea>
+                    <input
+                        type="number"
+                        id="edit_quantity"
+                        name="quantity"
+                        placeholder="Quantity"
+                        class="form-control form-prop"
+                        required
+                    />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+                    <input type="submit" class="btn btn-success" name="cmdaddnew" id="editShareBtn" value="Save">
+                </div>
+                </form>
+            </div>
+            </div>
+        </div>
+  
+        <!-- View Claims Modal HTML -->
+        <div id="viewClaims" class="modal fade" tabindex="-1" aria-labelledby="viewClaimsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" style="min-width: 40%; min-height: 30%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="viewClaimsModalLabel">View Claims</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" >
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col" style="min-width: 25%;">Claimer Name</th>
+                        <th scope="col" style="min-width: 25%;">Date of Claim</th>
+                        <th scope="col" style="min-width: 50%;">Contact</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Repeat this row for each claim -->
+                    <tr>
+                        <td>[claim Name]</td>
+                        <td>[Claim Date]</td>
+                        <td>
+                            <div class="view-claim-actions" style="display: flex; align-items: center;">
+                                <a href="#" class="btn btn-light icon-hover me-2"><i class="fas fa-envelope fa-lg text-secondary px-1"></i></a>
+                                <!-- <a href="#" class="btn btn-success shadow-0">Accept Claim</a> -->
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- End of claim row -->
+                    </tbody>
+                </table>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+                
+              
+        <!-- mark Claims Modal HTML -->
+        <div id="markClaims" class="modal fade" tabindex="-1" aria-labelledby="markClaimsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" style="min-width: 20%; min-height: 30%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="markClaimsModalLabel">Marks As Claimed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" >
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col" style="min-width: 50%;"></th>
+                        <th scope="col" style="min-width: 50%;"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    
+                    <tr>
+                        <td>John Doe</td>
+                        <td>
+                            <div class="view-claim-actions" style="display: flex; align-items: center;">
+                                <!-- <a href="#" class="btn btn-light icon-hover me-2"><i class="fas fa-envelope fa-lg text-secondary px-1"></i></a> -->
+                                <a href="#" class="btn btn-success shadow-0">Mark As Claimer</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+        <div id="claimAlert" class="modal fade" tabindex="-1" aria-labelledby="claimAlertLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered custom-modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="claimAlertLabel">Approved</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <p id="claimerName">Claim approved for <span></span></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">OK</button>
+                    </div>
+                <div>
+            </div>
+        </div>
+
+
+        
+    </main>
+
+
+    
+
+    <script src="{{url_for('static', filename='js/main.js')}}" defer></script>
+    <script>
+        function setShareId(shareId) {
+          document.getElementById('share_id_unshare').value = shareId;
+        }
+
+        // Edit shared item
+        function editSharedItem(shareId) {
+            // Construct the URL for fetching shared item details
+            var fetchUrl = `/your-shared-food/get-shared-item/${shareId}`;
+
+            fetch(fetchUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Populate the form fields with the fetched data
+                document.getElementById('edit_share_id').value = data.share_id;
+                document.getElementById('edit_title').value = data.title;
+                document.getElementById('edit_description').value = data.description;
+                document.getElementById('edit_quantity').value = data.quantity;
+                
+                // Set the form action to point to the edit-share route
+                var formAction = `/your-shared-food/edit-share/${shareId}`;
+                document.getElementById('editShareForm').action = formAction;
+            })
+            .catch(error => {
+                console.error('Error fetching shared item details:', error);
+            });
+        }
+
+        function viewClaims(shareId) {
+            // Clear existing rows in the table
+            const tableBody = document.querySelector('#viewClaims .modal-body tbody');
+            tableBody.innerHTML = '';
+
+            // Fetch the claim details from the Flask route
+            fetch(`/your-shared-food/get-claims/${shareId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(claim => {
+                        // Create a new row for each claim
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${claim.name}</td>
+                            <td>${claim.claim_date}</td>
+                            <td>
+                                <div class="view-claim-actions" style="display: flex; align-items: center;">
+                                    <a href="mailto:${claim.email}" class="btn btn-light icon-hover me-2">
+                                        <i class="fas fa-envelope fa-lg text-secondary px-1"></i>
+                                    </a>
+                                    <!-- Additional actions can be added here -->
+                                </div>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching claim details:', error));
+        }
+
+        function markClaims(shareId) {
+            // Clear existing rows in the table
+            const tableBody = document.querySelector('#markClaims .modal-body tbody');
+            tableBody.innerHTML = '';
+
+            // Fetch the claim details from the Flask route
+            fetch(`/your-shared-food/get-claims/${shareId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(claim => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${claim.name}</td>
+                            <td>
+                                <div class="view-claim-actions" style="display: flex; align-items: center;">
+                                    <a href="#" class="btn btn-success shadow-0">Mark As Claimer</a>
+                                </div>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                        const approveButton = row.querySelector('.btn-success');
+                        approveButton.addEventListener('click', (event) => {
+                            event.preventDefault(); // Prevent default anchor behavior
+                            approveClaim(claim.claim_id, claim.name);
+                        });
+                    });
+                })
+                    .catch(error => console.error('Error fetching claim details:', error));
+        }
+
+
+        function approveClaim(claimId, claimerName) {
+            fetch(`/your-shared-food/approve-claim/${claimId}`)
+                .then(response => {
+                    if (response.ok) {
+                        // Set sessionStorage item with claimerName
+                        sessionStorage.setItem('claimed', claimerName);
+                        // Refresh the page
+                        location.reload();
+                    } else {
+                        alert('Error approving claim');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error approving claim:', error);
+                    alert('Error approving claim');
+                });
+        }
+
+        // Check if the page was reloaded after a successful claim
+        document.addEventListener('DOMContentLoaded', (event) => {
+            if (sessionStorage.getItem('claimed')) {
+                const claimerName = sessionStorage.getItem('claimed');
+                sessionStorage.removeItem('claimed'); // Clear the item
+
+                // Update the modal content and show it
+                document.querySelector('#claimAlert #claimerName span').textContent = claimerName;
+                new bootstrap.Modal(document.getElementById('claimAlert')).show();
+            }
+        });
+
+        function setClaimId(claimId) {
+          document.getElementById('claim_id').value = claimId;
+        }
+
+    </script>
+  </body>
+</html>

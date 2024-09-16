@@ -1,0 +1,259 @@
+{% extends 'base/head.html' %}
+
+{% block head %}
+
+<title>Login/Register</title>
+
+{% endblock %}
+
+{% block body %}
+
+<main>
+    <div class="box">
+      <div class="inner-box">
+        <div class="forms-wrap">
+
+          <form action="{{ url_for('auth.index') }}" method="post" autocomplete="off" class="sign-in-form">
+            <div class="logo">
+              <img src="{{ url_for('static', filename='img/logo.png') }}" alt="easyclass" />
+              <h4>smartpatry</h4>
+            </div>
+
+            <div class="heading">
+              <h2>Welcome Back</h2> 
+              <h6>Not registred yet?</h6>
+              <a href="#signup" class="toggle">Sign up</a>
+
+              {% if not session %}
+              <p><br>{{ message }}</p>
+              {% endif %}
+            </div>
+
+            <div class="actual-form">
+              <input type="hidden" name="form_type" value="login">
+              <div class="input-wrap">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="input-field"
+                  autocomplete="off"
+                  required
+                />
+                <label>Email</label>
+              </div>
+
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  minlength="4"
+                  class="input-field"
+                  autocomplete="off"
+                  required
+                />
+                <label>Password</label>
+              </div>
+
+              <input type="submit" value="Sign In" class="sign-btn" />
+
+              <p class="text">
+                Forgotten your password or you login datails?
+                <a href="{{ url_for('auth.forgot_password') }}">Get help</a> signing in
+              </p>
+            </div>
+          </form>
+
+          <form action="{{ url_for('auth.index') }}" method="post" autocomplete="off" class="sign-up-form">
+            <div class="logo">
+              <img src="{{ url_for('static', filename='img/logo.png') }}" alt="smartpantry" />
+              <h4>smartpatry</h4>
+            </div>
+
+            <div class="heading">
+              <h2>Get Started</h2>
+              <h6>Already have an account?</h6>
+              <a href="#signin" class="toggle">Sign in</a>
+
+              {% if user %}
+              <p><br>{{ message }}</p>
+              {% endif %}
+            </div>
+
+
+            <div class="actual-form">
+              <input type="hidden" name="form_type" value="register">
+              <div class="form-row">
+                <div class="input-wrap">
+                  <input
+                  type="text"
+                  id="fname"
+                  name="fname"
+                  minlength="4"
+                  class="input-field"
+                  autocomplete="off"
+                  required
+                />
+                <label>First Name</label>
+                </div>
+                
+                <div class="input-wrap">
+                  <input
+                    type="text"
+                    id="lname"
+                    name="lname"
+                    minlength="4"
+                    class="input-field"
+                    autocomplete="off"
+                    required
+                    />
+                    <label>Last Name</label>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="input-wrap">
+                  <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  minlength="4"
+                  class="input-field"
+                  autocomplete="off"
+                  required
+                  />
+                  <label>Address</label>
+                </div>
+                
+                <div class="input-wrap">
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  minlength="4"
+                  class="input-field"
+                  autocomplete="off"
+                  required
+                  />
+                  <label>City</label>
+                </div>
+              </div>
+              
+              <div class="form-row">
+
+                <div class="input-wrap">
+                  <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  minlength="4"
+                  class="input-field"
+                  autocomplete="off"
+                  required/>
+                  <label>State</label>
+                </div>
+
+                <div class="input-wrap">
+                <input
+                type="text"
+                id="zip"
+                name="zip"
+                minlength="4"
+                class="input-field"
+                autocomplete="off"
+                required
+                />
+                <label>Zip Code</label>
+                </div>
+            </div>
+
+
+            <div class="form-row">
+              <div class="input-wrap">
+                <input
+                type="email"
+                id="email"
+                name="email"
+                class="input-field"
+                autocomplete="off"
+                required
+                />
+                <label>Email</label>
+              </div>
+              
+              
+              <div class="input-wrap">
+                <input
+                type="text"
+                minlength="4"
+                id="username"
+                name="username"
+                class="input-field"
+                autocomplete="off"
+                required
+                />
+                <label>Username</label>
+              </div>
+            </div>
+              
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  minlength="4"
+                  class="input-field"
+                  autocomplete="off"
+                  required
+                />
+                <label>Password</label>
+              </div>
+
+              <input type="submit" value="Sign Up" class="sign-btn" />
+
+              <p class="text">
+                By signing up, I agree to the
+                <a href="#">Terms of Services</a> and
+                <a href="#">Privacy Policy</a>
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <div class="carousel">
+          <div class="images-wrapper">
+            <img src="{{ url_for('static', filename='img/image1.png') }}" class="image img-1 show" alt="" />
+            <img src="{{ url_for('static', filename='img/image2.png') }}" class="image img-2" alt="" />
+            <!-- <img src="{{ url_for('static', filename='img/image3.png') }}" class="image img-3" alt="" /> -->
+          </div>
+
+          <div class="text-slider">
+            <div class="text-wrap">
+              <div class="text-group">
+                <h2>Manage Food Inventory</h2>
+                <h2>Share with Neighbors</h2>
+                <!-- <h2></h2> -->
+              </div>
+            </div>
+
+            <div class="bullets">
+              <span class="active" data-value="1"></span>
+              <span data-value="2"></span>
+              <!-- <span data-value="3"></span> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  {% if user and message %}
+  <script>
+      window.onload = function() {
+          location.hash = '#signup';
+      }
+  </script>
+  {% endif %}
+{% endblock %}
+```

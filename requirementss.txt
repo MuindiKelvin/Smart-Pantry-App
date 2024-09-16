@@ -1,0 +1,38 @@
+#App dependencies
+flask==2.3.3
+flask-SQLAlchemy==3.1.1
+mysql-connector-python==8.1.0
+SQLAlchemy==2.0.21
+
+
+
+# Requirements and Steps for Using venv with PowerShell:
+
+# 1. Python Installation:
+#     Ensure Python is installed.
+#     Command: python --version
+
+# 2. Update PowerShell Execution Policy:
+#     For virtual environment activation in PowerShell:
+#     Open PowerShell as an administrator.
+#     Command: Set-ExecutionPolicy Unrestricted -Scope Process
+#     celery -A app.tasks:celery worker --loglevel=info -P eventlet
+#     celery -A app.tasks:celery beat --loglevel=info
+
+
+# 3. Create a Virtual Environment:
+#     Navigate to your project directory.
+#     Command: cd path\to\your\project
+#     Create the virtual environment.
+#     Command: python -m venv myenv
+
+# 4. Activate the Virtual Environment:
+#     Activate the environment in PowerShell:
+#     Command: .\myenv\Scripts\Activate
+
+# 5. Work on Your Project:
+#     Install packages using pip within the environment.
+
+# 6. Deactivate the Virtual Environment:
+#     Command: deactivate
+#     Note: Always exercise caution when changing the execution policy in PowerShell. Understand the implications and risks of the commands you execute.

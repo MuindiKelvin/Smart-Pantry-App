@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+    />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content=""width="" , initial-scale=1.0" />
+    <title>SmartPantry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v2.1.6/css/unicons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/styles.css')}}"
+    />
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js" integrity="sha512-X/YkDZyjTf4wyc2Vy16YGCPHwAY8rZJY+POgokZjQB2mhIRFJCckEGc6YyX9eNsPfn0PzThEuNs+uaomE5CO6A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  </head>
+  <body>
+    {% include 'base/nav.html' %}
+
+    <main>
+      <div class="container1" style="margin-top: 25px">
+        
+        <div class="left">
+          <div class="sidebar">
+            <a class="menu-item active">
+              <span><i class="uil uil-home"></i></span>
+              <h3>Home</h3>
+            </a>
+            <a class="menu-item" href="{{ url_for('discover.index') }}" id="discover">
+              <span><i class="uil uil-compass"></i></span>
+              <h3>Discover</h3>
+            </a>
+            <a class="menu-item" href="{{ url_for('yourSharedFood.index') }}">
+              <span><i class="uil uil-compass"></i></span>
+              <h3>Activity</h3>
+            </a>
+            <!-- <a class="menu-item">
+              <span><i class="uil uil-compass"></i></span>
+              <h3>Analytics</h3>
+            </a> -->
+            <a class="menu-item" id="notifications" href="{{ url_for('notification.index') }}">
+              {% if session.get('logged_in') %}
+              <span
+                ><i class="uil uil-bell"
+                  ><small class="notification-count">{{ g.unread_count }}</small></i
+                ></span>
+              {% endif %}
+              <h3>Notifications</h3>
+            </a>
+            
+            <!-- Add category -->
+            <a href="#addCategory" data-toggle="modal"><label class="btn1 btn1-primary">Create Category</label></a>
+          </div>
+
+          <div class="sidebar">
+            <div class="box-inner box-inner-1">
+              <h5>Category List</h5>
+              <ul class="list-group list-group-flush">
+                {% for category in food_categories %}
+                <li class="list-group-item fs-7 d-flex justify-content-between align-items-center">
+                    <a href="#{{ category.category_id }}">{{ category.category_name }}</a>
+                    {% if category.category_name != 'Uncategorized' %}
+                        <a href="#deleteCategory" data-toggle="modal" data-category-id="{{ category.category_id }}" class="btn btn-sm btn-danger rounded-btn">Delete</a>
+                    {% endif %}
+                </li>
+              {% endfor %}
+              </ul>
+              
+            </div>
+
+          </div>
+        </div>
+
+        <div class="middle">
+          <div class="right grid-row">
+            <div class="request text-center">
+              <div>
+                <h5>Available Items</h5>
+                <p class="text-muted display-5 center">{{ inventory_analytics['available'] }}</p>
+              </div>
+            </div>
+            <div class="request text-center">
+              <div>
+                <h5>Consumed Items</h5>
+                <p class="text-muted display-5">{{ inventory_analytics['consumed'] }}</p>
+              </div>
+            </div>
+
+            <div class="request text-center">
+              <div>
+                <h5>Expired Items</h5>
+                <p class="text-muted display-5">{{ inventory_analytics['expired'] }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory Table -->
+          {% for category in food_categories %}
+            <div class="table-wrapper">
+                <div class="table-title">
+                    <div class="row justify-content-between">
+                        <div class="col-sm-6">
+                            <h2>{{ category.category_name }}</h2>
+                        </div>
+                        <div class="col-sm-6 d-flex justify-content-end">
+                            <a
+                                href="#addModal" class="btn1 mr-3 btn1-secondary" data-toggle="modal" id="{{ category.category_id }}" data-category-id="{{ category.category_id }}" onclick="setCategoryId(this);"><span>Add Food</span></a>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-stripped table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;"></th>
+                            <th style="width: 20%;">Food Item</th>
+                            <th style="width: 10%;">Quantity</th>
+                            <th style="width: 17%;">Days left</th>
+                            <th style="width: 15%;">Status</th>
+                            <th style="width: 18%;">Memo</th>
+                            <th style="width: 15%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% set items = category.food_items|list %}
+                      {% if items != [] %}
+                      {% for item in items %}
+                      <tr>
+                          <td>
+                            {% if item[6] %}
+                                <img src="{{ url_for('static', filename=item[6]) }}" alt="Food Image" width="100">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='img/food_images/noimagedefault.jpg') }}" alt="No Image" width="100">
+                            {% endif %}
+                          </td>
+                          <td>{{ item[0] }}</td>
+                          <td>{{ item[1] }}</td>
+                          <td>{{ item[3] }}</td>
+
+                          {% if item[4] == "Good" %}
+                          <td><span class="badge bg-success" style="font-size: 0.8rem;">{{ item[4] }}</span></td>
+                          {% elif item[4] == "Expired" %}
+                          <td><span class="badge bg-danger" style="font-size: 0.8rem;">{{ item[4] }}</span></td>
+                          {% elif item[4] == "Consumed" %}
+                          <td><span class="badge bg-info" style="font-size: 0.8rem;">{{ item[4] }}</span></td>
+                          {% else %}
+                          <td>{{ item[4] }}</td>
+                          {% endif %}
+
+                          <td>{{ item[5] if item[5] != "" else "None" }}</td>
+                          <td>
+                            <!-- Dropdown Button -->
+                            <div class="dropdown">
+                              <button class="btn1 btn2-secondary dropdown-toggle btn-sm" type="button" id="actionDropdownButton{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                Actions
+                              </button>
+                              <ul class="dropdown-menu" aria-labelledby="actionDropdownButton{{ loop.index }}">
+                                {% if item[8] != "Consumed" %}
+                                <li><a class="dropdown-item" href="#editFood" data-bs-toggle="modal" data-bs-target="#editFood" onclick="editItem('{{ item[7] }}');">Edit</a></li>
+                                <li><a class="dropdown-item" href="#deleteModal" data-bs-toggle="modal" data-bs-target="#deleteFood" onclick="setDeleteItem('{{ item[7] }}');">Delete</a></li>
+                                {% endif %}
+                                {% if item[4] != "Expired" and item[4] != "Consumed" %}
+                                <li><a class="dropdown-item" href="#markAsConsumedModal" data-bs-toggle="modal" data-bs-target="#markAsConsumedModal" onclick="setConsumedItem('{{ item[7] }}');">Mark As Consumed</a></li>
+                                <li><a class="dropdown-item" href="#markAsExpiredModal" data-bs-toggle="modal" data-bs-target="#markAsExpiredModal" onclick="setExpiredItem('{{ item[7] }}');">Mark As Expired</a></li>
+                                <li><a class="dropdown-item" href="#shareFoodModal" data-bs-toggle="modal" data-bs-target="#shareFoodModal" onclick="setItemID('{{ item[7] }}', '{{ item[1] }}');">Share Item</a></li>
+                                {% endif %}
+                                {% if item[4] == "Consumed" %}
+                                <li><a class="dropdown-item" href="#editFood" data-bs-toggle="modal" data-bs-target="#editFood" onclick="editItem('{{ item[7] }}');">Edit</a></li>
+                                <li><a class="dropdown-item" href="#deleteModal" data-bs-toggle="modal" data-bs-target="#deleteFood" onclick="setDeleteItem('{{ item[7] }}');">Delete</a></li>
+                                {% endif %}
+                              </ul>
+                            </div>
+                          </td>
+                      </tr>
+                      {% endfor %}
+                      {% else %}
+                      <tr>
+                        <td colspan="6" class="text-center">No food items in this category</td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+      </div>
+
+      <!-- ===========Scan barcode modal ============ -->
+      <div id="cameraModal" class="modal">
+        <div class="modal-content1">
+          <!-- <span class="close">&times;</span> -->
+          <div id="interactive" class=""></div>
+          <div id="barcodeResult"></div>
+        </div>
+      </div>
+      
+
+      <!-- Mark As Expired -->
+      <div id="markAsExpiredModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+            <div class="modal-content modal-xl">
+                <form action="{{ url_for('foodinventory.mark_as_expired') }}" method="post" id="markAsExpiredForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Mark As Expired</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <p>Are you sure you want to mark this item as Expired?</p>
+                            <input type="hidden" name="food_id" id="expiredFoodId" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <input type="button" class="btn btn-default" data-bs-dismiss="modal" value="Cancel" id="cancelExpired" />
+                        <input type="submit" class="btn btn-success" id="confirmExpired" value="Mark as Expired" />
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+
+      <!-- Mark As Consumed -->
+      <div id="markAsConsumedModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+            <div class="modal-content modal-xl">
+                <form action="{{ url_for('foodinventory.mark_as_consumed') }}" method="post" id="markAsConsumedForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Mark As Consumed</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <p>Are you sure you want to mark this item as consumed?</p>
+                            <input type="hidden" name="food_id" id="consumedFoodId" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <input type="button" class="btn btn-default" data-bs-dismiss="modal" value="Cancel" id="cancelConsumed" />
+                        <input type="submit" class="btn btn-success" id="confirmConsumed" value="Mark as Consumed" />
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+
+
+
+      <!-- add Modal HTML -->
+      <div id="addModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+          <div class="modal-content modal-xl">
+            <form
+              action="{{ url_for('foodinventory.add_food_item') }}"
+              method="post"
+              id="addFoodForm"
+              enctype="multipart/form-data"
+            >
+              <div class="modal-header">
+                <h4 class="modal-title">Add Food Item</h4>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-hidden="true"
+                  id="closeAdd"
+                >
+                  ×
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+
+                 <a href="#cameraModal" data-toggle="modal">
+                    <button type="button" id="scanBarcodeButton" class="btn btn-primary mb-2" style="background-color: white; border: dashed 1px green; color: #000; width: 100%;">Scan Barcode</button>
+                </a>
+
+                  <input
+                    type="text"
+                    placeholder="Food Name"
+                    id="food_name"
+                    name="food_name"
+                    class="form-control form-prop"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Expiry Date"
+                    id="expiration_date"
+                    onfocus="(this.type='date')"
+                    onblur="(this.type='text')"
+                    name="expiration_date"
+                    class="form-control"
+                    id="datepicker"
+                    required
+                  />
+                  <input type="hidden" id="hidden_category_id" name="category_id">
+                  <input
+                    type="text"
+                    id="quantity"
+                    name="quantity"
+                    placeholder="Quantity"
+                    class="form-control form-prop"
+                    autocomplete="off"
+                    required
+                  />
+                  <input
+                    type="file"
+                    id="food_image"
+                    name="food_image"
+                    accept="image/*"
+                    class="form-control form-prop"
+                  />
+                  <input
+                    type="hidden"
+                    id="food_image_url"
+                    name="food_image_url"
+                    value=""
+                  />
+                  <div id="imagePreviewContainer" style="display: none;">
+                    <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100px; max-height: 100px;"/>
+                  </div>
+
+                  <textarea
+                    class="form-control form-prop"
+                    placeholder="Memo"
+                    name="memo"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <input
+                  type="button"
+                  class="btn btn-default"
+                  data-dismiss="modal"
+                  value="Cancel"
+                  id="cancelAdd"
+                />
+                <input
+                  type="submit"
+                  class="btn btn-success"
+                  name="cmdaddnew"
+                  id="addCustomerBtn"
+                  value="Add"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+       <!-- Share Food Modal HTML -->
+       <div id="shareFoodModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+          <div class="modal-content modal-xl">
+            <form
+              action="{{ url_for('yourSharedFood.share_food') }}"
+              method="post"
+              id="addFoodForm"
+              enctype="multipart/form-data"
+            >
+              <div class="modal-header">
+                <h4 class="modal-title">Share Food</h4>
+                <button
+                  type="button"
+                  class="close"
+                  data-bs-dismiss="modal"
+                  aria-hidden="true"
+                >
+                  ×
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                  <input type="hidden" name="food_id" id="food_share_id" value="">
+                  <input type="hidden" name="available_quantity" id="available_quantity" value="">
+                  <input
+                    type="text"
+                    placeholder="Post title"
+                    id="post_title"
+                    name="post_title"
+                    class="form-control form-prop"
+                    required
+                  />
+                  <input
+                    type="text"
+                    id="quantity"
+                    name="quantity"
+                    placeholder="Quantity to share"
+                    class="form-control form-prop"
+                    autocomplete="off"
+                    required
+                  />
+                  <textarea
+                    class="form-control form-prop"
+                    placeholder="description"
+                    name="description"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <input
+                  type="button"
+                  class="btn btn-default"
+                  data-bs-dismiss="modal"
+                  value="Cancel"
+                />
+                <input
+                  type="submit"
+                  class="btn btn-success"
+                  name="cmdaddnew"
+                  id="addCustomerBtn"
+                  value="Share"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Category -->
+      <div id="addCategory" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+          <div class="modal-content modal-xl">
+            <form
+              action="{{ url_for('foodinventory.add_category') }}"
+              method="post"
+              id="addFoodForm"
+            >
+              <div class="modal-header">
+                <h4 class="modal-title">Add Category</h4>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-hidden="true"
+                >
+                  ×
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    placeholder="Category Name"
+                    id="category_name"
+                    name="category_name"
+                    class="form-control form-prop"
+                    required
+                  />
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <input
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                    value="Cancel"
+                  />
+                  <input
+                    type="submit"
+                    class="btn btn-success"
+                    name="cmdaddnew"
+                    id="addCustomerBtn"
+                    value="Add Category"
+                  />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Delete Category -->
+      <div id="deleteCategory" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+          <div class="modal-content modal-xl">
+            <form
+              action="{{ url_for('foodinventory.delete_category') }}"
+              method="post"
+              id="addFoodForm"
+            >
+              <div class="modal-header">
+                <h5 class="modal-title">Delete Category</h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-hidden="true"
+                >
+                  ×
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                    <p>If food items are in this category they will be moved to uncategorized</p>
+                    <input type="hidden" name="category_id" id="categoryIdInput" value="">
+                  </div>
+                </div>
+                <div class="modal-footer text-center">
+                  <input
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                    value="Cancel"
+                  />
+                  <input
+                    type="submit"
+                    class="btn btn-success"
+                    name="cmdaddnew"
+                    id="deleteCategory"
+                    value="Delete"
+                  />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Food -->
+      <div id="deleteFood" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+          <div class="modal-content modal-xl">
+            <form
+              action="{{ url_for('foodinventory.delete_food_item') }}"
+              method="post"
+              id="addFoodForm"
+            >
+              <div class="modal-header">
+                <h5 class="modal-title">Delete Item</h5>
+                <button
+                type="button"
+                class="close"
+                data-bs-dismiss="modal"
+                aria-hidden="true"
+                >
+                  ×
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                    <p>Are you sure you want to remove this food item?</p>
+                    <input type="hidden" name="food_id" id="food_id" value="">
+                  </div>
+                </div>
+                <div class="modal-footer text-center">
+                  <input
+                    type="button"
+                    class="btn btn-default"
+                    data-bs-dismiss="modal"
+                    value="Cancel"
+                  />
+                  <input
+                    type="submit"
+                    class="btn btn-success"
+                    name="cmdaddnew"
+                    id="deleteFood"
+                    value="Delete"
+                  />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Edit Modal HTML -->
+      <div id="editFood" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+          <div class="modal-content modal-xl">
+            <form
+              action="#"
+              method="post"
+              id="editFoodForm"
+              enctype="multipart/form-data"
+            >
+              <div class="modal-header">
+                <h4 class="modal-title">Edit Food Item</h4>
+                <button
+                  type="button"
+                  class="close"
+                  data-bs-dismiss="modal"
+                  aria-hidden="true"
+                >
+                  ×
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    placeholder="Food Name"
+                    id="edit_food_name"
+                    name="food_name"
+                    class="form-control form-prop"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Expiry Date"
+                    id="edit_expiration_date"
+                    onfocus="(this.type='date')"
+                    onblur="(this.type='text')"
+                    name="expiration_date"
+                    class="form-control"
+                    id="datepicker"
+                    required
+                  />
+                  <input type="hidden" id="edit_hidden_category_id" name="category_id">
+                  <input
+                    type="text"
+                    id="edit_quantity"
+                    name="quantity"
+                    placeholder="Quantity"
+                    class="form-control form-prop"
+                    autocomplete="off"
+                    required
+                  />
+                  <input
+                    type="file"
+                    id="food_image"
+                    name="food_image"
+                    accept="image/*"
+                    class="form-control form-prop"
+                  />
+                  <textarea
+                    class="form-control form-prop"
+                    placeholder="Memo"
+                    name="memo"
+                    id = "edit_memo"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <input
+                  type="button"
+                  class="btn btn-default"
+                  data-bs-dismiss="modal"
+                  value="Cancel"
+                />
+                <input
+                  type="submit"
+                  class="btn btn-success"
+                  name="cmdaddnew"
+                  id="editFoodBtn"
+                  value="Save"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <script src="{{url_for('static', filename='js/main.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/barcodeScanner.js') }}"></script>
+    <script>
+        $(document).on('click', '.btn1-secondary', function() {
+        var categoryId = $(this).data('category-id');
+        
+        // Set the category_id to the hidden input field in the modal
+        $('#hidden_category_id').val(categoryId);
+        });
+
+        $(document).ready(function() {
+          $('#deleteCategory').on('show.bs.modal', function(event) {
+              var button = $(event.relatedTarget);
+              var categoryId = button.data('category-id'); 
+              var modal = $(this);
+              modal.find('input[name="category_id"]').val(categoryId);
+          });
+        });
+        
+        function setDeleteItem(foodId) {
+          document.getElementById('food_id').value = foodId;
+        }
+        function setConsumedItem(foodId) {
+          document.getElementById('consumedFoodId').value = foodId;
+        }
+        function setExpiredItem(foodId) {
+          document.getElementById('expiredFoodId').value = foodId;
+        }
+
+        function setItemID(foodId, foodQuantity) {
+          document.getElementById('food_share_id').value = foodId;
+          document.getElementById('available_quantity').value = foodQuantity;
+        }
+
+        function editItem(foodId) {
+            // Use AJAX to get the food item details from the server
+            var fetchUrl = `{{ url_for('foodinventory.get_food_item', id=0) }}`;
+            fetchUrl = fetchUrl.replace('0', foodId);
+            formAction = `{{ url_for('foodinventory.edit_food_item', id=0) }}`;
+            formAction = formAction.replace('0', foodId);
+            fetch(fetchUrl)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_food_name').value = data.food_name;
+                document.getElementById('edit_expiration_date').value = data.expiration_date;
+                document.getElementById('edit_hidden_category_id').value = data.category_id;
+                document.getElementById('edit_quantity').value = data.quantity;
+                document.getElementById('edit_memo').textContent = data.memo;
+
+                document.getElementById('editFoodForm').action = formAction;
+            })
+            .catch(error => {
+                console.error('Error fetching food item details:', error);
+            });
+        }
+
+        document.body.addEventListener('click', function() {
+            var backdrops = document.getElementsByClassName('modal-backdrop show');
+            
+            var backdropsArray = Array.from(backdrops);
+
+            backdropsArray.forEach(function(backdrop) {
+                backdrop.parentNode.removeChild(backdrop);
+            });
+        });
+
+        document.getElementById('closeAdd').addEventListener('click', function() {
+            location.reload();
+        });
+
+        document.getElementById('cancelAdd').addEventListener('click', function() {
+            location.reload(); 
+        });
+                
+    </script>
+  </body>
+</html>

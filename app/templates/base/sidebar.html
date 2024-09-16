@@ -1,0 +1,82 @@
+<div class="left">
+    <div class="sidebar">
+      <a class="menu-item" href="{{ url_for('index') }}" id="home">
+        <span><i class="uil uil-home"></i></span>
+        <h3>Home</h3>
+      </a>
+      <a class="menu-item" href="{{ url_for('discover.index') }}" id="discover">
+        <span><i class="uil uil-compass"></i></span>
+        <h3>Discover</h3>
+      </a>
+      <a class="menu-item" href="{{ url_for('yourSharedFood.index') }}" id="listing">
+        <span><i class="uil uil-compass"></i></span>
+        <h3>Activity</h3>
+      </a>
+      <!-- <a class="menu-item" id="analytics">
+        <span><i class="uil uil-compass"></i></span>
+        <h3>Analytics</h3>
+      </a> -->
+      <a class="menu-item" id="notifications" href="{{ url_for('notification.index') }}">
+        {% if session.get('logged_in') %}
+        <span
+          ><i class="uil uil-bell"
+            ><small class="notification-count">{{ g.unread_count }}</small></i
+          ></span>
+        {% endif %}
+        <h3>Notifications</h3>
+        <!-- <div class="notifications-popup">
+          <div>
+            <div class="profile-pic">
+              <img src="" />
+            </div>
+            <div class="notification-body">
+              <b>Food Expiry</b>Fish expires soon
+              <small class="text-muted">2 DAYS AGO</small>
+            </div>
+          </div>
+          <div>
+            <div class="profile-pic">
+              <img src="" />
+            </div>
+            <div class="notification-body">
+              <b>Shared Food</b> Claim made on shared food
+              <small class="text-muted">1 HOUR AGO</small>
+            </div>
+          </div>
+          <div>
+            <div class="profile-pic">
+              <img src="" />
+            </div>
+            <div class="notification-body">
+              <b>Food Expiry</b> Egg exipring soon
+              <small class="text-muted">4 MINUTES AGO</small>
+            </div>
+          </div>
+        </div> -->
+      </a>
+
+      {% block left_sidebar %}
+      {% endblock %}
+
+  </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var menuItems = document.querySelectorAll('.menu-item');
+      
+        var currentURL = window.location.pathname;
+        var discoverURL = '/discover/shared-items';
+        menuItems.forEach(function(item) {
+            if (item.getAttribute('href') === currentURL) {
+                item.classList.add('active');
+            }
+            if (discoverURL === currentURL) {
+                var discoverElement = document.getElementById('discover');
+                if (discoverElement) {
+                    discoverElement.classList.add('active');
+                }
+            }
+        });
+    });
+    </script>
+    
